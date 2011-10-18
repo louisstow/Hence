@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="hence.js" type="text/javascript"></script>
+    <title>Hence</title>
+  </head>
+  <body>
+    <h1>Hence</h1>
+    <p>
+      <textarea id="text" cols="80" rows="24">
+add
+  0
+  _swap
+  _sub
+  _sub
+
+print_number
+  _echon
+  "\n"
+  _echo
+
+main
+  2
+  7
+  add
+  print_number
+      </textarea>
+    </p>
+    <p>
+      <button onclick="(new
+      Hence(document.getElementById('text').value)).parse().dump()">Parse/Dump</button>
+      <button onclick="(new
+      Hence(document.getElementById('text').value)).parse().execute()">Execute</button>
+    </p>
+    <pre id="console" onclick="document.getElementById('console').innerHTML = ''"></pre>
+  </body>
+</html>
