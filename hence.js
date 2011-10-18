@@ -17,6 +17,11 @@ var Hence = (function(text, undefined) {
             _stack.push(_stack.length);
         },
 
+        // [ x -- ]
+        '_drop': function() {
+            _stack.pop();
+        },
+
         // [ x -- x x ]
         '_dup': function() {
             _stack.push(_stack[_stack.length - 1]);
@@ -156,6 +161,15 @@ var Hence = (function(text, undefined) {
             }
 
             _walk(_program['main']);
+        },
+
+        getBuiltins: function() {
+            var v = [];
+
+            for (var key in _builtins) {
+                v.push(key);
+            }
+            return v;
         },
 
         parse: function() {
