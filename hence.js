@@ -106,14 +106,14 @@ var Hence = (function(text, undefined) {
                     _builtins[word[i]]();
                     break;
                 } else {
-                    throw('Unknown builtin');
+                    throw('Unknown builtin: ' + word[i]);
                 }
             case 'identifier':
                 if (typeof _program[word[i]] !== 'undefined') {
                     _walk(_program[word[i]]);
                     break;
                 } else {
-                    throw('Unknown identifier');
+                    throw('Unknown identifier: ' + word[i]);
                 }
             case 'comment':
                 continue;
@@ -130,9 +130,10 @@ var Hence = (function(text, undefined) {
                         --j;
                     }
                 }
+				_stack.push();
                 break;
             default:
-                throw('Unknown word');
+                throw('Unknown word: ' + word[i]);
             }
         }
     };
@@ -185,7 +186,7 @@ var Hence = (function(text, undefined) {
                         if (typeof _program[word] === 'undefined') {
                             _program[word] = [];
                         } else {
-                            throw('Duplicate identifier');
+                            throw('Duplicate identifier: ' + word);
                         }
                     }
                 } else {
