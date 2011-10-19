@@ -67,7 +67,7 @@ var Hence = (function(text, undefined) {
     };
 
     var _isIdentifier = function(s) {
-        return ('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+        return ('_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
             .indexOf(s.substr(0, 1)) !== -1;
     };
 
@@ -193,22 +193,22 @@ var Hence = (function(text, undefined) {
 				// indentation required for function body
 				if(cha === " " && inIdentifier) {
 					newLine = false;
-					
+				}
+				
+				// reached a comma or a new line
+				if(inIdentifier && (cha === "," || cha === "\n" || cha === " ")) {
+					// close the opened number
 					if(startNumber !== false) {
 						tempStack.push(_text.substring(startNumber, i));
 						startNumber = false;
 					}
 					
+					// close the opened function call
 					if(startCall !== false) {
 						tempStack.push(_text.substring(startCall, i));
 						startCall = false;
 					}
 					
-					continue;
-				}
-				
-				// reached a comma or a new line
-				if(inIdentifier && (cha === "," || cha === "\n")) {
 					var instr;
 					for(j = 0; j < tempStack.length; ++j) {
 						instr = tempStack.pop();
@@ -286,6 +286,8 @@ var Hence = (function(text, undefined) {
 					continue;
 				}
 			}
+			
+			return this;
 		},
 
         parseOld: function() {
