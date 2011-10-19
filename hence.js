@@ -122,7 +122,7 @@ var Hence = (function(text, undefined) {
                 break;
             case 'string':
                 _stack.push(0);
-                for (var j = word[i].length - 1 - 1; j > 0; --j) {
+                for (var j = word[i].length - 1; j > 0; --j) {
                     if (word[i].substr(j, 1) !== 'n') {
                         _stack.push(word[i].substr(j, 1).charCodeAt(0));
                     } else if (word[i].substr(j - 1, 1) === "\\") {
@@ -247,7 +247,7 @@ var Hence = (function(text, undefined) {
 				// reaching this point will be the body
 				
 				// open comment
-				if(!openComment && cha === "[") {
+				if(openQuote === false && !openComment && cha === "[") {
 					openComment = true;
 					continue;
 				}
@@ -292,42 +292,6 @@ var Hence = (function(text, undefined) {
 			console.log(_program);
 			
 			return this;
-		},
-
-        parseOld: function() {
-            var v = _text.split("\n");
-			var line;
-
-            for (var i = 0; i < v.length; ++i) {
-				//current line
-				line = v[i];
-				
-                // If there's an identifier at the beginning of the line...
-                if (('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
-                    .indexOf(v[i].substr(0, 1)) !== -1) {
-                    // It's a word declaration.
-                    var word = v[i];
-                    if (word.length > 0) {
-                        if (typeof _program[word] === 'undefined') {
-                            _program[word] = [];
-                        } else {
-                            throw('Duplicate identifier: ' + word);
-                        }
-                    }
-                } else {
-                    // parse every char
-					for(var j = 0;  j < line.length; ++j) {
-					
-					}
-					
-                    // Append the word body to the program.
-                    if (v[i].substr(j).length > 0) {
-                        _program[word].push(v[i].substr(j));
-                    }
-                }
-            }
-
-            return this;
-        }
+		}
     };
 });
