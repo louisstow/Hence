@@ -72,7 +72,7 @@ var Hence = (function(text, undefined) {
     };
 
     var _isNumber = function(s) {
-        return ('0123456789').indexOf(s.substr(0, 1)) !== -1;
+        return ('-0123456789').indexOf(s.substr(0, 1)) !== -1;
     };
 
     var _isString = function(s) {
@@ -172,11 +172,87 @@ var Hence = (function(text, undefined) {
             }
             return v;
         },
+		
+		parse: function() {
+			var openQuote = false,
+				openComment = false,
+				inIdentifier = false,
+				currentIdentifier,
+				newLine = true,
+				identifier,
+				cha, // current character
+				j;
+				
+			// loop over every char
+			for(var i = 0; i < _text.length; ++i) {
+				cha = _text.charAt(i);
+				
+				// indentation required for function body
+				if(cha === " " && inIdentifier) {
+					newLine = false;
+					continue;
+				}
+				
+				// identifier
+				if(newLine && _isIdentifier(cha)) {
+					j = i;
+					while(_text.charAt(++j) !== '\n');
+					
+					var word = _text.substring(i, j);
+					if(_program[word]) {
+						throw('Duplicate identifier: ' + word);
+					} else {
+						_program[word] = [];
+					}
+					
+					newLine = true;
+					inIdentifier = true;
+					currentIdentifier = word;
+					i = j; //skip parsing the identifier name
+					continue;
+				}
+				
+				// reaching this point will be the body
+				
+				// open comment
+				if(cha === "[") {
+					openComment = true;
+					continue;
+				}
+				
+				// ignore everything while the comment is open
+				if(openComment && cha !== "]") continue;
+				
+				// comment is closed
+				if(openComment && cha === "]") {
+					openComment = false;
+					continue;
+				}
+				
+				if(_isNumber(cha)) {
+					
+				}
+				
+				if(cha === '"') {
+					// start of the string
+					if(openQuote === false) {
+						openQuote = i;
+					} // end of the string, add to program
+					else {
+						_program[currentIdentifier].push(_text.substring(openQuote, i));
+					}
+				}
+			}
+		},
 
-        parse: function() {
+        parseOld: function() {
             var v = _text.split("\n");
+			var line;
 
             for (var i = 0; i < v.length; ++i) {
+				//current line
+				line = v[i];
+				
                 // If there's an identifier at the beginning of the line...
                 if (('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
                     .indexOf(v[i].substr(0, 1)) !== -1) {
@@ -190,15 +266,11 @@ var Hence = (function(text, undefined) {
                         }
                     }
                 } else {
-                    // Otherwise, it's a word body.
-
-                    // Skip whitespace...
-                    for (var j = 0; j < v[i].length; ++j) {
-                        if (v[i].substr(j, 1) !== ' ') {
-                            break;
-                        }
-                    }
-
+                    // parse every char
+					for(var j = 0;  j < line.length; ++j) {
+					
+					}
+					
                     // Append the word body to the program.
                     if (v[i].substr(j).length > 0) {
                         _program[word].push(v[i].substr(j));
