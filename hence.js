@@ -55,6 +55,22 @@ var Hence = (function(text, undefined) {
 
 			_stack.push(y);
 			_stack.push(x);
+		},
+		
+		// execute JavaScript
+		'_native': function() {
+			var func = "",
+				x;
+			
+			while((x = _stack.pop()) !== 0) {
+				func += String.fromCharCode(x);
+			}
+			
+			if(typeof window[func] !== "function") {
+				throw("Unknown JS function: " + func);
+			}
+			
+			_stack.push(window[func]());
 		}
 	};
 
@@ -187,7 +203,7 @@ var Hence = (function(text, undefined) {
 				tempStack = [];
 				
 			// loop over every char
-			for(var i = 0; i < _text.length; ++i) {
+			for(var i = 0; i <= _text.length; ++i) {
 				cha = _text.charAt(i);
 				
 				// indentation required for function body
@@ -195,8 +211,8 @@ var Hence = (function(text, undefined) {
 					newLine = false;
 				}
 				
-				// reached a comma or a new line
-				if(inIdentifier && (cha === "," || cha === "\n" || cha === " ")) {
+				// reached a comma or a new line or the end of the text
+				if(i === _text.length || (inIdentifier && (cha === "," || cha === "\n" || cha === " "))) {
 					// close the opened number
 					if(startNumber !== false) {
 						tempStack.push(_text.substring(startNumber, i));
