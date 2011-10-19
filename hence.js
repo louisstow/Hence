@@ -209,10 +209,13 @@ var Hence = (function(text, undefined) {
 						startCall = false;
 					}
 					
-					var instr;
-					for(j = 0; j < tempStack.length; ++j) {
-						instr = tempStack.pop();
-						_program[currentIdentifier].push(instr);
+					// if a newline or a comma, add the temp stack to the program
+					if(cha !== " ") {
+						var instr, l = tempStack.length;
+						for(j = 0; j < l; ++j) {
+							instr = tempStack.pop();
+							_program[currentIdentifier].push(instr);
+						}
 					}
 					
 					if(cha === "\n") {
@@ -286,6 +289,7 @@ var Hence = (function(text, undefined) {
 					continue;
 				}
 			}
+			console.log(_program);
 			
 			return this;
 		},
