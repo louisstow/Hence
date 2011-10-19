@@ -175,13 +175,16 @@ var Hence = (function(text, undefined) {
 		
 		parse: function() {
 			var openQuote = false,
+				startNumber = false,
+				startCall = false,
 				openComment = false,
 				inIdentifier = false,
 				currentIdentifier,
 				newLine = true,
 				identifier,
 				cha, // current character
-				j;
+				j,
+				tempStack = [];
 				
 			// loop over every char
 			for(var i = 0; i < _text.length; ++i) {
@@ -190,6 +193,32 @@ var Hence = (function(text, undefined) {
 				// indentation required for function body
 				if(cha === " " && inIdentifier) {
 					newLine = false;
+					
+					if(startNumber !== false) {
+						tempStack.push(_text.substring(startNumber, i));
+						startNumber = false;
+					}
+					
+					if(startCall !== false) {
+						tempStack.push(_text.substring(startCall, i));
+						startCall = false;
+					}
+					
+					continue;
+				}
+				
+				// reached a comma or a new line
+				if(inIdentifier && (cha === "," || cha === "\n")) {
+					var instr;
+					for(j = 0; j < tempStack.length; ++j) {
+						instr = tempStack.pop();
+						_program[currentIdentifier].push(instr);
+					}
+					
+					if(cha === "\n") {
+						newLine = true;
+					}
+					
 					continue;
 				}
 				
@@ -208,14 +237,14 @@ var Hence = (function(text, undefined) {
 					newLine = true;
 					inIdentifier = true;
 					currentIdentifier = word;
-					i = j; //skip parsing the identifier name
+					i = j; // skip parsing the identifier name
 					continue;
 				}
 				
 				// reaching this point will be the body
 				
 				// open comment
-				if(cha === "[") {
+				if(!openComment && cha === "[") {
 					openComment = true;
 					continue;
 				}
@@ -229,18 +258,32 @@ var Hence = (function(text, undefined) {
 					continue;
 				}
 				
-				if(_isNumber(cha)) {
-					
+				// start of a number
+				if(startNumber === false && _isNumber(cha)) {
+					startNumber = i;
+					continue;
 				}
+				
+				// ignore the string contents
+				if(openQuote !== false && cha !== '"') continue;
 				
 				if(cha === '"') {
 					// start of the string
 					if(openQuote === false) {
 						openQuote = i;
-					} // end of the string, add to program
+					} // end of the string, add to temp stack
 					else {
-						_program[currentIdentifier].push(_text.substring(openQuote, i));
+						tempStack.push(_text.substring(openQuote, i));
+						openQuote = false;
 					}
+					
+					continue;
+				}
+				
+				// must be a call to a function
+				if(startCall === false && _isIdentifier(cha)) {
+					startCall = i;
+					continue;
 				}
 			}
 		},
